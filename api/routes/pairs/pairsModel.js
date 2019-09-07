@@ -13,7 +13,8 @@ const getPairBySymbol = symbol => {
 
 const addPair = pairObj => {
   pairObj.symbol = pairObj.symbol.toUpperCase();
-  return db("pairs").insert(pairObj);
+
+  return db("pairs").insert(pairObj, "id");
 };
 
 module.exports = {
