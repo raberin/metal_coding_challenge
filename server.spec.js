@@ -28,3 +28,29 @@ describe("server.js", () => {
     });
   });
 });
+
+// describe("pairs.js route", () => {
+//   describe("GET /api/trading-pairs", () => {
+//     it("returns 200 OK", () => {
+//       //make a GET request to / on our server
+//       return request(server)
+//         .get("/api/trading-pairs")
+//         .then(res => {
+//           expect(res.status).toBe(200);
+//         });
+//       //check that the status code is 200
+//     });
+
+//     it("should return a JSON object", async () => {
+//       const response = await request(server).get("/");
+
+//       expect(response.type).toMatch(/json/);
+//     });
+
+//     it("should return 3 pairs", async () => {
+//       const response = await request(server).get("/api/trading-pairs");
+
+//       expect(response.body.length).toBe(3);
+//     });
+//   });
+// });

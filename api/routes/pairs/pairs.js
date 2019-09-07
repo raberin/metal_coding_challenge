@@ -2,7 +2,7 @@
 const express = require("express");
 
 //Import Helper Functions
-const pairsDb = require("./pairsDb.js");
+const pairsDb = require("./pairsModel.js");
 
 //Create Router
 const router = express.Router();
@@ -16,6 +16,22 @@ router.get("/", async (req, res) => {
     res
       .status(500)
       .json({ message: "We ran into an error retrieving the trading pairs" });
+  }
+});
+
+router.get("/:symbol", async (req, res) => {
+  try {
+    const { symbol } = req.params;
+    const pair = await pairsDb.getPairBySymbol(symbol);
+    if (symbol) {
+      res, status(200).json(pair);
+    } else {
+      res.status(404).json({ message: "Invalid Symbol" });
+    }
+  } catch (err) {
+    res.status(500).json({
+      message: "Error retrieving symbol"
+    });
   }
 });
 

@@ -11,7 +11,7 @@ server.use(express.json({ extended: true }));
 server.use(cors());
 
 //Routes
-server.use("/api/v1/trading-pairs", tradingPairsRouter);
+server.use("/api/trading-pairs", tradingPairsRouter);
 
 //Test Route
 server.get("/", (req, res) => {
