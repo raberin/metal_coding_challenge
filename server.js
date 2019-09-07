@@ -1,16 +1,17 @@
 const express = require("express");
 const server = express();
 const cors = require("cors");
-const bodyParser = require("body-parser");
 
 //Route Files
-// const tradingPairsRouter = require("./api/routes/tradingPairs");
+const tradingPairsRouter = require("./api/routes/pairs/pairs.js");
+// const tickerRouter = require('./api/routes/ticker/ticker.js')
 
 //Init Middleware
 server.use(express.json({ extended: true }));
+server.use(cors());
 
 //Routes
-// server.use("/api/v1/trading-pairs", tradingPairsRouter);
+server.use("/api/v1/trading-pairs", tradingPairsRouter);
 
 //Test Route
 server.get("/", (req, res) => {
