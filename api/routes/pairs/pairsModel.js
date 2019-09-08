@@ -17,8 +17,32 @@ const addPair = pairObj => {
   return db("pairs").insert(pairObj, "id");
 };
 
+const addTickerData = obj => {
+  return db("ticker").insert(obj);
+};
+
+const removeTickerData = id => {
+  return db("ticker")
+    .where("id", id)
+    .del();
+};
+
+const getTickerData = id => {
+  return db("ticker").where("symbol_id", id);
+};
+
+const truncateData = () => {
+  return db("ticker")
+    .where("symbol_id", id)
+    .del();
+};
+
 module.exports = {
   getTradingPairs,
   getPairBySymbol,
-  addPair
+  addPair,
+  addTickerData,
+  removeTickerData,
+  getTickerData,
+  truncateData
 };
