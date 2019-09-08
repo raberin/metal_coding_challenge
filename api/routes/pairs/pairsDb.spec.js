@@ -2,9 +2,14 @@ const pairsModel = require("./pairsModel.js");
 const db = require("../../dbConfig.js");
 
 describe("pairs model", () => {
+  //cross-env DB_ENV=testing
+  it('tests are running with DB_ENV set as "testing"', () => {
+    expect(process.env.DB_ENV).toBe("testing");
+  });
+
   //Deletes values in table after every test
   beforeEach(async () => {
-    await db("pairs").truncate();
+    await db.raw(`truncate table pairs restart identity cascade`);
   });
 
   describe("addPair()", () => {

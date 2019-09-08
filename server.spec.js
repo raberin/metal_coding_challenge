@@ -8,7 +8,17 @@ describe("server.js", () => {
     expect(process.env.DB_ENV).toBe("testing");
   });
 
+  //Deletes values in table after every test
+  beforeEach(async () => {
+    await db.raw(`truncate table pairs restart identity cascade`);
+  });
+
   describe("GET /", () => {
+    //Deletes values in table after every test
+    beforeEach(async () => {
+      await db.raw(`truncate table pairs restart identity cascade`);
+    });
+
     it("returns 200 OK", () => {
       //make a GET request to / on our server
       return request(server)
@@ -32,7 +42,7 @@ describe("server.js", () => {
 describe("pairs.js route", () => {
   //Deletes values in table after every test
   beforeEach(async () => {
-    await db("pairs").truncate();
+    await db.raw(`truncate table pairs restart identity cascade`);
   });
 
   describe("POST /api/trading-pairs", () => {
@@ -96,4 +106,6 @@ describe("pairs.js route", () => {
       expect(response.body).toEqual(expectedBody);
     });
   });
+
+  describe("POST ");
 });

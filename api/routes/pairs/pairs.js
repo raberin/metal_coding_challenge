@@ -13,7 +13,7 @@ const router = express.Router();
 //Binance API
 const Binance = require("binance-api-node").default;
 const client = Binance();
-client.time().then(time => console.log(time));
+// client.time().then(time => console.log(time));
 
 //Endpoints
 router.get("/", async (req, res) => {
@@ -67,8 +67,8 @@ router.post("/:symbol/ticker", async (req, res) => {
   const { symbol } = req.params;
   const pair = await pairsModel.getPairBySymbol(symbol);
   //Grabs id from get request
+  console.log(pair);
   let id = pair.id;
-
   try {
     //Starts socket
     const socket = client.ws.ticker(symbol, async ticker => {
@@ -76,8 +76,10 @@ router.post("/:symbol/ticker", async (req, res) => {
         data: ticker,
         symbol_id: id
       };
-      const addedTicker = await pairsModel.addTickerData(ticketJson);
-      res.status(200).json(addedTicker);
+      await pairsModel.addTickerData(ticketJson);
+      res
+        .status(201)
+        .json({ message: "The socket is connected and is posting data" });
     });
   } catch (err) {
     res.status(500).json(err);
@@ -87,27 +89,27 @@ router.post("/:symbol/ticker", async (req, res) => {
 //Closes websocket connection
 router.delete("/:symbol/ticker", async (req, res) => {
   const { symbol } = req.params;
-  const pair = await pairsModel.getPairBySymbol(symbol);
-  //Grabs id from get request
-  let id = pair.id;
 
   try {
+    const pair = await pairsModel.getPairBySymbol(symbol);
+    //Grabs id from get request
+    let id = pair.id;
     //Starts socket
     const socket = client.ws.ticker(symbol, async ticker => {
       console.log(ticker);
     });
     socket;
     const deletedTicker = await pairsModel.removeTickerData(id);
-    res.status(200).json(deletedTicker);
+    res.status(200).json({ message: "The socket has been disconnected" });
   } catch (err) {
     err;
   }
 });
 
-//Closes websocket connection
+// Truncates Data
 router.delete("/:symbol/ticker/d", async (req, res) => {
   try {
-    const deleteData = await pairsModel.truncateData(id);
+    const deleteData = await pairsModel.truncateData();
     res.status(200).json(deleteData);
   } catch (err) {
     err;
@@ -121,11 +123,29 @@ router.get("/:symbol/ticker", async (req, res) => {
   //Grabs id from get request
   let id = pair.id;
 
-  try {
-    const getTicker = await pairsModel.getTickerData(id);
-    res.status(200).json(getTicker);
-  } catch (err) {
-    err;
+  //Access the startTime and endTime Params (hh:mm:ss)
+  let startTime = req.query.starttime;
+  let endTime = req.query.endtime;
+  console.log(startTime, endTime);
+
+  if (!startTime || !endTime) {
+    try {
+      const getTicker = await pairsModel.getTickerData(id);
+      res.status(200).json(getTicker);
+    } catch (err) {
+      err;
+    }
+  } else {
+    try {
+      const getTicker = await pairsModel.getTickerDataTime(
+        id,
+        startTime,
+        endTime
+      );
+      res.status(200).json(getTicker);
+    } catch (err) {
+      err;
+    }
   }
 });
 

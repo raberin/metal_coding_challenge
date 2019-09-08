@@ -28,13 +28,22 @@ const removeTickerData = id => {
 };
 
 const getTickerData = id => {
-  return db("ticker").where("symbol_id", id);
+  return db("ticker")
+    .select("data")
+    .where("symbol_id", id);
+};
+
+const getTickerDataTime = (id, starttime, endtime) => {
+  return db.raw(
+    `select data from ticker 
+    where symbol_id = ${id} 
+    and created_at::time between '${starttime}' 
+    and '${endtime}'`
+  );
 };
 
 const truncateData = () => {
-  return db("ticker")
-    .where("symbol_id", id)
-    .del();
+  return db("ticker").truncate();
 };
 
 module.exports = {
@@ -44,5 +53,6 @@ module.exports = {
   addTickerData,
   removeTickerData,
   getTickerData,
-  truncateData
+  truncateData,
+  getTickerDataTime
 };
