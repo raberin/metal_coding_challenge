@@ -4,7 +4,6 @@ const cors = require("cors");
 
 //Route Files
 const tradingPairsRouter = require("./api/routes/pairs/pairs.js");
-// const tickerRouter = require('./api/routes/ticker/ticker.js')
 
 //Init Middleware
 server.use(express.json({ extended: true }));

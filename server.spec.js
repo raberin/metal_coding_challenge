@@ -107,5 +107,33 @@ describe("pairs.js route", () => {
     });
   });
 
-  describe("POST ");
+  describe("POST /api/trading-pairs/:symbol/ticker", () => {
+    it("returns 201 Created", async () => {
+      //Posts to DB
+      await request(server)
+        .post("/api/trading-pairs")
+        .send({ symbol: "ethbtc" });
+
+      const response = await request(server).post(
+        "/api/trading-pairs/ethbtc/ticker"
+      );
+      expect(response.status).toEqual(201);
+    });
+  });
+
+  describe("GET /api/trading-pairs/:symbol/ticker", () => {
+    it("returns 200 Created", async () => {
+      //Posts to DB
+      await request(server)
+        .post("/api/trading-pairs")
+        .send({ symbol: "ethbtc" });
+
+      await request(server).post("/api/trading-pairs/ethbtc/ticker");
+
+      const response = await request(server).get(
+        "/api/trading-pairs/ethbtc/ticker"
+      );
+      expect(response.status).toEqual(200);
+    });
+  });
 });
