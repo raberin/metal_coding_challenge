@@ -13,7 +13,10 @@ const router = express.Router();
 //Binance API
 const Binance = require("binance-api-node").default;
 const client = Binance();
-// client.time().then(time => console.log(time));
+client.time().then(time => console.log(time));
+
+//Websocket
+// const WebSocket = require("ws");
 
 //Endpoints
 router.get("/", async (req, res) => {
@@ -55,19 +58,16 @@ router.get("/:symbol", async (req, res) => {
   }
 });
 
-// const socket = client.ws.ticker(symbol, async ticker => {
-//   let ticketJson = {
-//     data: ticker,
-//     symbol_id: id
-//   };
-// });
-
 //Opens websocket connection and saves json into data row in ticker table
 router.post("/:symbol/ticker", async (req, res) => {
   const { symbol } = req.params;
+
   const pair = await pairsModel.getPairBySymbol(symbol);
+
+  //Access the startTime and endTime Params (hh:mm:ss)
+  let connectionTime = req.query.connectionTime || 5000;
+
   //Grabs id from get request
-  console.log(pair);
   let id = pair.id;
   try {
     //Starts socket
@@ -76,37 +76,36 @@ router.post("/:symbol/ticker", async (req, res) => {
         data: ticker,
         symbol_id: id
       };
+      console.log(ticketJson);
       await pairsModel.addTickerData(ticketJson);
-      res
-        .status(201)
-        .json({ message: "The socket is connected and is posting data" });
+      //Terminates connection after 10secs or query string
+      setTimeout(() => {
+        socket();
+      }, connectionTime);
+    });
+    res.status(201).json({
+      message: "The socket is connected and is posting data"
     });
   } catch (err) {
+    console.log("errrrr");
     res.status(500).json(err);
   }
 });
 
-//Closes websocket connection
-router.delete("/:symbol/ticker", async (req, res) => {
-  const { symbol } = req.params;
+// Closes websocket connection
+// router.delete("/:symbol/ticker", async (req, res) => {
+//   const { symbol } = req.params;
+//   // const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@trade`);
+//   await ws.close();
+//   try {
+//     //Starts socket
+//     res.status(200).json({ message: "The socket has been disconnected" });
+//   } catch (err) {
+//     err;
+//   }
+// });
 
-  try {
-    const pair = await pairsModel.getPairBySymbol(symbol);
-    //Grabs id from get request
-    let id = pair.id;
-    //Starts socket
-    const socket = client.ws.ticker(symbol, async ticker => {
-      console.log(ticker);
-    });
-    socket;
-    const deletedTicker = await pairsModel.removeTickerData(id);
-    res.status(200).json({ message: "The socket has been disconnected" });
-  } catch (err) {
-    err;
-  }
-});
-
-// Truncates Data
+// Truncates Data Helper Route
 router.delete("/:symbol/ticker/d", async (req, res) => {
   try {
     const deleteData = await pairsModel.truncateData();
@@ -126,7 +125,6 @@ router.get("/:symbol/ticker", async (req, res) => {
   //Access the startTime and endTime Params (hh:mm:ss)
   let startTime = req.query.starttime;
   let endTime = req.query.endtime;
-  console.log(startTime, endTime);
 
   if (!startTime || !endTime) {
     try {
