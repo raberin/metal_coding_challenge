@@ -15,9 +15,6 @@ const Binance = require("binance-api-node").default;
 const client = Binance();
 client.time().then(time => console.log(time));
 
-//Websocket
-// const WebSocket = require("ws");
-
 //Endpoints
 router.get("/", async (req, res) => {
   try {
@@ -76,7 +73,7 @@ router.post("/:symbol/ticker", async (req, res) => {
         data: ticker,
         symbol_id: id
       };
-      console.log(ticketJson);
+
       await pairsModel.addTickerData(ticketJson);
       //Terminates connection after 10secs or query string
       setTimeout(() => {
